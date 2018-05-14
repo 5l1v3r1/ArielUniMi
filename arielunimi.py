@@ -44,7 +44,7 @@ def load_pubblicazioni_analizzate():
 def save_pubblicazioni_analizzate(title):
     try:
         f = open("pubblicazioni_analizzate.txt", "ab")
-        f.write(str(title) + "\n")
+        f.write(title + "\n")
         f.close()
     except IOError as e:
         logging.error(e, exc_info=True)
