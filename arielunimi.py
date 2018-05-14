@@ -88,22 +88,32 @@ def main():
     load_pubblicazioni_analizzate()
 
     # Effettuo il login ad Ariel e ne ricavo i Cookie di sessione
-    urllogin = "https://elearning.unimi.it/authentication/skin/portaleariel/login.aspx?url=https://ariel.unimi.it/?reset=true"
-    session = requests.Session()
-    session.post(urllogin, data=data, headers=headerdesktop, timeout=timeoutconnection)
+    try:
+        urllogin = "https://elearning.unimi.it/authentication/skin/portaleariel/login.aspx?url=https://ariel.unimi.it/?reset=true"
+        session = requests.Session()
+        session.post(urllogin, data=data, headers=headerdesktop, timeout=timeoutconnection)
 
-    cookie = session.cookies.get_dict()
+        cookie = session.cookies.get_dict()
+    except Exception as e:
+        logging.error("Errore nell'autenticazione: %s" % e)
+        sys.exit(1)
 
     # Visualizzo la pagina del docente per estrarne le pubblicazioni
-    page = requests.get(Config.urlportaledocente, cookies=cookie, headers=headerdesktop, timeout=timeoutconnection)
-    soupdesktop = BeautifulSoup(page.text, "html.parser")
+    try:
+        if cookie:
+            page = requests.get(Config.urlportaledocente, cookies=cookie, headers=headerdesktop,
+                                timeout=timeoutconnection)
+            soupdesktop = BeautifulSoup(page.text, "html.parser")
 
-    for h2 in soupdesktop.find_all("h2", attrs={"class": "arielTitle"}):
+            for h2 in soupdesktop.find_all("h2", attrs={"class": "arielTitle"}):
 
-        if h2.text.strip() not in pubblicazioniList:
-            send_email(h2.text.strip())
-            logging.info("Nuova pubblicazione rilevata: %s" % h2.text.strip())
-            save_pubblicazioni_analizzate(h2.text.strip())
+                if h2.text.strip() not in pubblicazioniList:
+                    send_email(h2.text.strip())
+                    logging.info("Nuova pubblicazione rilevata: %s" % h2.text.strip())
+                    save_pubblicazioni_analizzate(h2.text.strip())
+    except Exception as e:
+        logging.error("Errore nell'acquisizione delle pubblicazioni: %s" % e)
+        pass
 
 
 if __name__ == "__main__":
