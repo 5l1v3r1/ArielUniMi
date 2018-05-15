@@ -19,8 +19,6 @@ logging.basicConfig(filename="arielunimi.log",
 # Lista di tutte le pubblicazioni gia analizzate
 pubblicazioniList = []
 
-data = {"ddlType": "", "hdnSilent": "true", "tbLogin": Config.emailunimi, "tbPassword": Config.passwunimi}
-
 
 def load_pubblicazioni_analizzate():
     try:
@@ -68,7 +66,7 @@ def send_email(title):
 
         header = "From: " + fromaddr + "\r\n"
         header += "To: " + ", ".join(toaddrs) + "\r\n"
-        header += "Subject: Arie UniMi Scanner: " + title + "\r\n"
+        header += "Subject: Ariel UniMi Scanner: " + title + "\r\n"
         header += "Date: " + datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S -0000") + "\r\n\r\n"
 
         msg = header + "Rilevata Pubblicazione: \n"
@@ -90,6 +88,8 @@ def main():
     # Effettuo il login ad Ariel e ne ricavo i Cookie di sessione
     try:
         urllogin = "https://elearning.unimi.it/authentication/skin/portaleariel/login.aspx?url=https://ariel.unimi.it/?reset=true"
+        data = {"ddlType": "", "hdnSilent": "true", "tbLogin": Config.emailunimi, "tbPassword": Config.passwunimi}
+
         session = requests.Session()
         session.post(urllogin, data=data, headers=headerdesktop, timeout=timeoutconnection)
 
